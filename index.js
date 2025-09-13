@@ -2,52 +2,34 @@ import { createCanvas, loadImage } from "@napi-rs/canvas";
 import axios from "axios";
 
 export default async function handler(req, res) {
-  const { avatar1, avatar2 } = req.query;
+  const { avatar } = req.query;
 
-  if (!avatar1 || !avatar2) {
-    return res.status(400).json({ error: "Missing avatar1 or avatar2 URL" });
+  if (!avatar) {
+    return res.status(400).json({ error: "Missing avatar URL" });
   }
 
   try {
-    // Load background template
+    // Load background template (single person template)
     const template = await loadImage("https://i.ibb.co/YFJrLSpL/image.jpg");
 
-    // Load avatars
-    const avatar1Resp = await axios.get(avatar1, { responseType: "arraybuffer" });
-    const avatarImg1 = await loadImage(Buffer.from(avatar1Resp.data));
+    // Load avatar
+    const avatarResp = await axios.get(avatar, { responseType: "arraybuffer" });
+    const avatarImg = await loadImage(Buffer.from(avatarResp.data));
 
-    const avatar2Resp = await axios.get(avatar2, { responseType: "arraybuffer" });
-    const avatarImg2 = await loadImage(Buffer.from(avatar2Resp.data));
-
-    // Create canvas same size as template
-    const canvas = createCanvas(template.width, template.height);
+    // Create canvas with template size
+    const canvas = createCanvas(466, 659); // same size as template
     const ctx = canvas.getContext("2d");
 
-    // Draw template
-    ctx.drawImage(template, 0, 0, template.width, template.height);
+    // Draw background template
+    ctx.drawImage(template, 0, 0, 466, 659);
 
-    // === Avatar 1: man profile pic ===
+    // === Avatar placement with circular mask ===
     ctx.save();
-    const manX = 180; // X position of man profile (adjusted for template)
-    const manY = 40;  // Y position
-    const manSize = 120; // Diameter
     ctx.beginPath();
-    ctx.arc(manX + manSize / 2, manY + manSize / 2, manSize / 2, 0, Math.PI * 2);
+    ctx.arc(150 + 55, 76 + 55, 55, 0, Math.PI * 2, true); // adjust according to template
     ctx.closePath();
     ctx.clip();
-    ctx.drawImage(avatarImg1, manX, manY, manSize, manSize);
-    ctx.restore();
-
-    // === Avatar 2: secondary avatar ===
-    ctx.save();
-    const avatarX = 245; // X position
-    const avatarY = 305; // Y position
-    const avatarSize = 100; // Diameter
-    ctx.beginPath();
-    ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.clip();
-    ctx.drawImage(avatarImg2, avatarX, avatarY, avatarSize, avatarSize);
+    ctx.drawImage(avatarImg, 150, 76, 110, 110); // avatar size and position
     ctx.restore();
 
     // Output image
@@ -59,4 +41,4 @@ export default async function handler(req, res) {
     console.error("Canvas error:", err);
     return res.status(500).json({ error: "Error generating image" });
   }
-      }
+}
