@@ -23,11 +23,10 @@ export default async function handler(req, res) {
     // Draw the background template
     ctx.drawImage(template, 0, 0, template.width, template.height);
 
-    // === Draw avatar in the correct circular spot ===
-    // Coordinates & size measured from template
-    const avatarX = 173; // top-left x of circle
-    const avatarY = 90;  // top-left y of circle
-    const avatarSize = 120; // width & height to perfectly fit the circle
+    // === Draw avatar on head with circular mask ===
+    const avatarX = 260; // adjust to center on head
+    const avatarY = 30;  // adjust to top of head
+    const avatarSize = 70; // fit the head properly
 
     ctx.save();
     ctx.beginPath();
@@ -38,7 +37,7 @@ export default async function handler(req, res) {
     ctx.drawImage(avatarImg, avatarX, avatarY, avatarSize, avatarSize);
     ctx.restore();
 
-    // Send as PNG
+    // Send PNG
     res.setHeader("Content-Type", "image/png");
     const buffer = await canvas.encode("png");
     return res.send(buffer);
