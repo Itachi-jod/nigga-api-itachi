@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
   try {
     // Load background template (single person template)
-    const template = await loadImage("https://i.ibb.co/YFJrLSpL/image.jpg");
+    const template = await loadImage("https://i.ibb.co/4ZsQJk5Y/image.jpg");
 
     // Load avatar
     const avatarResp = await axios.get(avatar, { responseType: "arraybuffer" });
