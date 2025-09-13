@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Load background template (single person template)
+    // Load template
     const template = await loadImage("https://i.ibb.co/4ZsQJk5Y/image.jpg");
 
     // Load avatar
@@ -17,22 +17,21 @@ export default async function handler(req, res) {
     const avatarImg = await loadImage(Buffer.from(avatarResp.data));
 
     // Create canvas with template size
-    const canvas = createCanvas(466, 659); // same size as template
+    const canvas = createCanvas(template.width, template.height);
     const ctx = canvas.getContext("2d");
 
-    // Draw background template
-    ctx.drawImage(template, 0, 0, 466, 659);
+    // Draw template
+    ctx.drawImage(template, 0, 0, template.width, template.height);
 
-    // === Avatar placement with circular mask ===
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(150 + 55, 76 + 55, 55, 0, Math.PI * 2, true); // adjust according to template
-    ctx.closePath();
-    ctx.clip();
-    ctx.drawImage(avatarImg, 150, 76, 110, 110); // avatar size and position
-    ctx.restore();
+    // Draw avatar over the man's profile (fill entire area)
+    // Adjust these coordinates & size to perfectly cover the profile
+    const avatarX = 70; // x-position of man’s face
+    const avatarY = 35; // y-position of man’s face
+    const avatarWidth = 130; // width to cover
+    const avatarHeight = 130; // height to cover
+    ctx.drawImage(avatarImg, avatarX, avatarY, avatarWidth, avatarHeight);
 
-    // Output image
+    // Output
     res.setHeader("Content-Type", "image/png");
     const buffer = await canvas.encode("png");
     return res.send(buffer);
@@ -41,4 +40,4 @@ export default async function handler(req, res) {
     console.error("Canvas error:", err);
     return res.status(500).json({ error: "Error generating image" });
   }
-}
+      }
