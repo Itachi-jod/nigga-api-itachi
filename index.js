@@ -23,20 +23,19 @@ export default async function handler(req, res) {
     // Draw the background template
     ctx.drawImage(template, 0, 0, template.width, template.height);
 
-    // === Draw avatar in circle at the correct position ===
-    // These numbers are measured from the template
-    const centerX = 234; // x center of profile circle
-    const centerY = 155; // y center of profile circle
-    const radius = 65;   // radius of profile circle
+    // === Draw avatar in the correct circular spot ===
+    // Coordinates & size measured from template
+    const avatarX = 173; // top-left x of circle
+    const avatarY = 90;  // top-left y of circle
+    const avatarSize = 120; // width & height to perfectly fit the circle
 
     ctx.save();
     ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
+    ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2, true);
     ctx.closePath();
     ctx.clip();
 
-    // Draw avatar fully covering the circle
-    ctx.drawImage(avatarImg, centerX - radius, centerY - radius, radius * 2, radius * 2);
+    ctx.drawImage(avatarImg, avatarX, avatarY, avatarSize, avatarSize);
     ctx.restore();
 
     // Send as PNG
