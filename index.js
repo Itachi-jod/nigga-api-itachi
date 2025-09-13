@@ -23,15 +23,22 @@ export default async function handler(req, res) {
     // Draw template
     ctx.drawImage(template, 0, 0, template.width, template.height);
 
-    // Draw avatar over the man's profile (fill entire area)
-    // Adjust these coordinates & size to perfectly cover the profile
-    const avatarX = 70; // x-position of man’s face
-    const avatarY = 35; // y-position of man’s face
-    const avatarWidth = 130; // width to cover
-    const avatarHeight = 130; // height to cover
-    ctx.drawImage(avatarImg, avatarX, avatarY, avatarWidth, avatarHeight);
+    // Draw avatar as circle over man’s profile
+    const centerX = 135; // center x of man’s profile
+    const centerY = 100; // center y of man’s profile
+    const radius = 65;   // radius of profile circle
 
-    // Output
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.clip();
+
+    // Draw avatar fully covering circle
+    ctx.drawImage(avatarImg, centerX - radius, centerY - radius, radius * 2, radius * 2);
+    ctx.restore();
+
+    // Output PNG
     res.setHeader("Content-Type", "image/png");
     const buffer = await canvas.encode("png");
     return res.send(buffer);
@@ -40,4 +47,4 @@ export default async function handler(req, res) {
     console.error("Canvas error:", err);
     return res.status(500).json({ error: "Error generating image" });
   }
-      }
+}
